@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% load wagtailcore_tags wagtailimages_tags core_tags %}
+
+{% block body_class %}template-homepage{% endblock %}
+
+{% block content %}
+<section class="hero" data-reveal>
+    <div class="container container--wide hero__inner">
+        <div class="hero__text">
+            {% if page.role %}<p class="eyebrow">{{ page.role }}</p>{% endif %}
+            <h1 class="hero__title">{{ page.title }}</h1>
+            {% if page.intro %}<div class="hero__intro prose">{{ page.intro|richtext }}</div>{% endif %}
+            {% if page.hero_buttons %}
+            <div class="button-row">
+                {% for button in page.hero_buttons %}
+                <a href="{{ button.value.href }}"{% if button.value.open_in_new_tab %} target="_blank" rel="noopener"{% endif %} class="btn btn--{{ button.value.style }}">
+                    {% if button.value.icon %}{% icon button.value.icon css_class="btn__icon" %}{% endif %}<span>{{ button.value.text }}</span>
+                </a>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+        {% if page.photo %}
+        <div class="hero__media">
+            {% image page.photo fill-480x480 as hero_img %}
+            <img src="{{ hero_img.url }}" width="{{ hero_img.width }}" height="{{ hero_img.height }}" alt="{{ page.title }}">
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+{% if page.body %}
+<nav class="page-nav" data-page-nav aria-label="Page sections">
+    <div class="container container--wide page-nav__inner">
+        <ul>
+            {% for block in page.body %}
+            {% if block.value.show_in_page_nav and block.value.anchor %}
+            <li><a href="#{{ block.value.anchor }}">{{ block.value.heading|default:block.value.eyebrow }}</a></li>
+            {% endif %}
+            {% endfor %}
+        </ul>
+    </div>
+</nav>
+{% endif %}
+
+{% include_block page.body %}
+{% endblock %}

@@ -1,0 +1,10 @@
+{% load wagtailimages_tags %}
+<div class="gallery" style="--gallery-columns: {{ value.columns }}" data-reveal>
+    {% for item in value.images %}
+    <figure class="gallery__item">
+        {% image item.image width-800 as rendered_image %}
+        <img src="{{ rendered_image.url }}" width="{{ rendered_image.width }}" height="{{ rendered_image.height }}" alt="{{ item.caption|default:item.image.title }}" loading="lazy">
+        {% if item.caption %}<figcaption>{{ item.caption }}</figcaption>{% endif %}
+    </figure>
+    {% endfor %}
+</div>

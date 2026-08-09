@@ -1,0 +1,51 @@
+{% load core_tags %}
+{% with contact=settings.core.ContactSettings %}
+<section class="section section--bg-{{ value.background }} contact-section"{% if value.anchor %} id="{{ value.anchor }}"{% endif %} data-reveal>
+    <div class="container container--normal">
+        <div class="section__head section__head--center">
+            {% if value.eyebrow %}<p class="eyebrow">{{ value.eyebrow }}</p>{% endif %}
+            {% if value.heading %}<h2 class="section__title">{{ value.heading }}</h2>{% endif %}
+            {% if value.intro %}<div class="section__intro prose">{{ value.intro }}</div>{% endif %}
+            {% if value.show_availability and contact.availability_text %}
+            <p class="availability-badge{% if contact.availability_available %} availability-badge--available{% else %} availability-badge--unavailable{% endif %}">
+                <span class="availability-dot"></span>{{ contact.availability_text }}
+            </p>
+            {% endif %}
+        </div>
+
+        <div class="contact-grid">
+            {% if value.show_email and contact.email %}
+            <a href="mailto:{{ contact.email }}" class="contact-item">{% icon "mail" %}<span>{{ contact.email }}</span></a>
+            {% endif %}
+            {% if value.show_phone and contact.phone %}
+            <a href="tel:{{ contact.phone }}" class="contact-item">{% icon "phone" %}<span>{{ contact.phone }}</span></a>
+            {% endif %}
+            {% if value.show_location and contact.location %}
+            <span class="contact-item">{% icon "map-pin" %}<span>{{ contact.location }}</span></span>
+            {% endif %}
+        </div>
+
+        {% if value.show_social and contact.social_links %}
+        <ul class="social-row">
+            {% for link in contact.social_links %}
+            <li>
+                <a href="{{ link.value.url }}" target="_blank" rel="noopener" class="social-link" aria-label="{{ link.value.label|default:link.value.platform }}">
+                    {% icon link.value.platform %}
+                </a>
+            </li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+
+        {% if value.links %}
+        <div class="button-row button-row--center">
+            {% for link in value.links %}
+            <a href="{{ link.href }}"{% if link.open_in_new_tab %} target="_blank" rel="noopener"{% endif %} class="btn btn--{{ link.style }}">
+                {% if link.icon %}{% icon link.icon css_class="btn__icon" %}{% endif %}<span>{{ link.text }}</span>
+            </a>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+</section>
+{% endwith %}

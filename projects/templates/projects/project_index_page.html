@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% load wagtailcore_tags wagtailimages_tags core_tags %}
+
+{% block body_class %}template-projectindexpage{% endblock %}
+
+{% block content %}
+<section class="section" data-reveal>
+    <div class="container container--wide">
+        <div class="section__head">
+            <p class="eyebrow">Work</p>
+            <h1 class="section__title">{{ page.title }}</h1>
+            {% if page.intro %}<div class="section__intro prose">{{ page.intro|richtext }}</div>{% endif %}
+        </div>
+        <div class="project-grid project-grid--grid">
+            {% for project in page.get_children_projects %}
+            <article class="project-card">
+                <a href="{% pageurl project %}" class="project-card__link">
+                    {% if project.cover_image %}
+                    {% image project.cover_image fill-640x400 as cover_img %}
+                    <div class="project-card__media">
+                        <img src="{{ cover_img.url }}" width="{{ cover_img.width }}" height="{{ cover_img.height }}" alt="" loading="lazy">
+                        <span class="project-card__status project-card__status--{{ project.status }}">{{ project.status_label }}</span>
+                    </div>
+                    {% else %}
+                    <div class="project-card__media project-card__media--placeholder">
+                        {% icon "layers" css_class="project-card__media-icon" %}
+                        <span class="project-card__status project-card__status--{{ project.status }}">{{ project.status_label }}</span>
+                    </div>
+                    {% endif %}
+                    <div class="project-card__body">
+                        <h3 class="project-card__title">{{ project.title }}</h3>
+                        <p class="project-card__summary">{{ project.summary }}</p>
+                        {% if project.tech_list %}
+                        <ul class="tag-list">
+                            {% for tech in project.tech_list %}<li class="tag">{{ tech }}</li>{% endfor %}
+                        </ul>
+                        {% endif %}
+                    </div>
+                </a>
+            </article>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}

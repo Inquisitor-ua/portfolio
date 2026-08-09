@@ -1,0 +1,17 @@
+.venv/
+__pycache__/
+**/__pycache__/
+*.pyc
+.git/
+.claude/
+_icons/
+build_sprite.py
+db.sqlite3
+media/
+staticfiles/
+.env
+.env.example
+docker-compose.yml
+Dockerfile
+docker/
+*.md

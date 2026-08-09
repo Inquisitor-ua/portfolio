@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% load wagtailcore_tags wagtailimages_tags core_tags %}
+
+{% block body_class %}template-projectpage{% endblock %}
+
+{% block content %}
+<header class="project-header" data-reveal>
+    <div class="container container--normal">
+        <p class="eyebrow"><a href="{% pageurl page.get_parent.specific %}">&larr; Projects</a></p>
+        <h1 class="section__title">{{ page.title }}</h1>
+        <p class="project-header__summary">{{ page.summary }}</p>
+
+        <div class="project-header__meta">
+            <span class="project-card__status project-card__status--{{ page.status }}">{{ page.status_label }}</span>
+            {% if page.date_started %}
+            <span>{{ page.date_started|date:"Y" }}{% if page.date_completed %} – {{ page.date_completed|date:"Y" }}{% endif %}</span>
+            {% endif %}
+        </div>
+
+        {% if page.tech_list %}
+        <ul class="tag-list">
+            {% for tech in page.tech_list %}<li class="tag">{{ tech }}</li>{% endfor %}
+        </ul>
+        {% endif %}
+
+        <div class="button-row">
+            <a href="{{ page.subdomain_url }}" target="_blank" rel="noopener" class="btn btn--primary">
+                {% icon "external" css_class="btn__icon" %}<span>View live</span>
+            </a>
+            {% if page.repo_url %}
+            <a href="{{ page.repo_url }}" target="_blank" rel="noopener" class="btn btn--secondary">
+                {% icon "github" css_class="btn__icon" %}<span>Source code</span>
+            </a>
+            {% endif %}
+        </div>
+    </div>
+
+    {% if page.cover_image %}
+    <div class="container container--wide">
+        {% image page.cover_image width-1600 as cover_img %}
+        <img src="{{ cover_img.url }}" width="{{ cover_img.width }}" height="{{ cover_img.height }}" alt="" class="project-header__cover">
+    </div>
+    {% endif %}
+</header>
+
+{% if page.body %}
+<section class="section project-body" data-reveal>
+    <div class="container container--normal">
+        <div class="section__content">
+            {% include_block page.body %}
+        </div>
+    </div>
+</section>
+{% endif %}
+{% endblock %}

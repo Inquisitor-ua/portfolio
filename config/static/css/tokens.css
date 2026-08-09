@@ -1,0 +1,117 @@
+/*
+ * Design tokens — dark tech-minimalism by default, with a light theme
+ * toggled via [data-theme="light"] on <html> (see the inline script in
+ * base.html, and js/config.js for the toggle button).
+ */
+
+:root {
+    /* Surfaces */
+    --bg: #0a0e16;
+    --bg-tint: #0d1220;
+    --bg-panel: #121826;
+    --bg-dark: #070a10;
+    --bg-elevated: #161d2e;
+
+    /* Text */
+    --text: #e7ebf3;
+    --text-muted: #92a0b5;
+    --text-faint: #5b6883;
+    --text-on-accent: #050708;
+
+    /* Borders */
+    --border: #212b3d;
+    --border-strong: #2c3850;
+
+    /* Accent */
+    --accent: #7c8cff;
+    --accent-2: #22d3ee;
+    --accent-strong: #97a4ff;
+    --accent-soft: rgba(124, 140, 255, 0.12);
+
+    /* Status */
+    --tone-info: #60a5fa;
+    --tone-success: #34d399;
+    --tone-warning: #fbbf24;
+
+    /* Shadows */
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+    --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.35);
+    --shadow-lg: 0 24px 64px rgba(0, 0, 0, 0.45);
+
+    /* Radii */
+    --radius-sm: 6px;
+    --radius-md: 12px;
+    --radius-lg: 20px;
+    --radius-full: 999px;
+
+    /* Spacing scale */
+    --space-3xs: 0.25rem;
+    --space-2xs: 0.5rem;
+    --space-xs: 0.75rem;
+    --space-sm: 1rem;
+    --space-md: 1.5rem;
+    --space-lg: 2.5rem;
+    --space-xl: 4rem;
+    --space-2xl: 6rem;
+    --space-3xl: 8rem;
+
+    /* Type */
+    --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --font-mono: ui-monospace, SFMono-Regular, "SF Mono", "Cascadia Code", Menlo, Consolas, "Liberation Mono", monospace;
+
+    /* Layout */
+    --container-narrow: 42rem;
+    --container-normal: 60rem;
+    --container-wide: 78rem;
+    --header-height: 4.5rem;
+
+    --ease: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+:root[data-theme="light"] {
+    --bg: #f7f8fb;
+    --bg-tint: #eef1f7;
+    --bg-panel: #ffffff;
+    --bg-dark: #0a0e16;
+    --bg-elevated: #ffffff;
+
+    --text: #10141f;
+    --text-muted: #4d5768;
+    --text-faint: #8791a3;
+    --text-on-accent: #ffffff;
+
+    --border: #e1e5ee;
+    --border-strong: #cbd2e1;
+
+    --accent: #4f46e5;
+    --accent-2: #0891b2;
+    --accent-strong: #4338ca;
+    --accent-soft: rgba(79, 70, 229, 0.1);
+
+    --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.06);
+    --shadow-md: 0 8px 24px rgba(15, 23, 42, 0.08);
+    --shadow-lg: 0 24px 64px rgba(15, 23, 42, 0.12);
+}
+
+@media (prefers-color-scheme: light) {
+    :root:not([data-theme]) {
+        --bg: #f7f8fb;
+        --bg-tint: #eef1f7;
+        --bg-panel: #ffffff;
+        --bg-dark: #0a0e16;
+        --bg-elevated: #ffffff;
+        --text: #10141f;
+        --text-muted: #4d5768;
+        --text-faint: #8791a3;
+        --text-on-accent: #ffffff;
+        --border: #e1e5ee;
+        --border-strong: #cbd2e1;
+        --accent: #4f46e5;
+        --accent-2: #0891b2;
+        --accent-strong: #4338ca;
+        --accent-soft: rgba(79, 70, 229, 0.1);
+        --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.06);
+        --shadow-md: 0 8px 24px rgba(15, 23, 42, 0.08);
+        --shadow-lg: 0 24px 64px rgba(15, 23, 42, 0.12);
+    }
+}

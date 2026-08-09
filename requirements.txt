@@ -1,0 +1,17 @@
+# Core CMS stack
+Django==6.0.7
+wagtail==7.4.2
+
+# Configuration
+python-dotenv==1.2.2
+dj-database-url==3.1.2
+
+# Database driver (PostgreSQL in Docker; SQLite needs nothing extra)
+psycopg[binary]==3.3.4
+
+# Serving
+gunicorn==26.0.0
+whitenoise==6.12.0
+
+# Images
+Pillow==12.3.0

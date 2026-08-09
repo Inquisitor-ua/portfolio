@@ -1,0 +1,4 @@
+{% if value.level == "h2" %}<h2{% if value.anchor %} id="{{ value.anchor }}"{% endif %} class="block-heading">{{ value.text }}</h2>
+{% elif value.level == "h3" %}<h3{% if value.anchor %} id="{{ value.anchor }}"{% endif %} class="block-heading">{{ value.text }}</h3>
+{% else %}<h4{% if value.anchor %} id="{{ value.anchor }}"{% endif %} class="block-heading">{{ value.text }}</h4>
+{% endif %}

@@ -1,0 +1,48 @@
+{% load wagtailcore_tags wagtailimages_tags core_tags %}
+{% wagtail_site as current_site %}
+
+<header class="site-header" data-site-header>
+    <div class="container container--full site-header__inner">
+        <a href="/" class="site-header__brand">
+            {% if settings.core.SiteBrandingSettings.logo %}
+                {% image settings.core.SiteBrandingSettings.logo height-40 as logo_img %}
+                <img src="{{ logo_img.url }}" width="{{ logo_img.width }}" height="{{ logo_img.height }}" alt="{{ settings.core.SiteBrandingSettings.site_name }}" class="site-header__logo">
+            {% else %}
+                <span class="site-header__name">{{ settings.core.SiteBrandingSettings.site_name|default:current_site.site_name|default:"Portfolio" }}</span>
+            {% endif %}
+        </a>
+
+        <nav class="site-nav" aria-label="Primary">
+            <ul class="site-nav__list">
+                {% for link in settings.core.NavigationSettings.primary_links %}
+                <li>
+                    <a href="{{ link.value.href }}"{% if link.value.is_external %} target="_blank" rel="noopener"{% endif %} class="site-nav__link">{{ link.value.text }}</a>
+                </li>
+                {% endfor %}
+            </ul>
+        </nav>
+
+        <div class="site-header__actions">
+            <button type="button" class="theme-toggle" data-theme-toggle aria-label="Switch to light theme">
+                {% icon "sun" css_class="theme-toggle__icon theme-toggle__icon--sun" %}
+                {% icon "moon" css_class="theme-toggle__icon theme-toggle__icon--moon" %}
+            </button>
+            <button type="button" class="nav-toggle" data-nav-toggle aria-label="Open menu" aria-expanded="false" aria-controls="mobile-nav">
+                {% icon "menu" css_class="nav-toggle__icon nav-toggle__icon--open" %}
+                {% icon "close" css_class="nav-toggle__icon nav-toggle__icon--close" %}
+            </button>
+        </div>
+    </div>
+
+    <div class="mobile-nav" id="mobile-nav" data-mobile-nav>
+        <nav aria-label="Primary">
+            <ul class="mobile-nav__list">
+                {% for link in settings.core.NavigationSettings.primary_links %}
+                <li>
+                    <a href="{{ link.value.href }}"{% if link.value.is_external %} target="_blank" rel="noopener"{% endif %} class="mobile-nav__link" data-nav-close>{{ link.value.text }}</a>
+                </li>
+                {% endfor %}
+            </ul>
+        </nav>
+    </div>
+</header>

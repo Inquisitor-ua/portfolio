@@ -1,0 +1,7 @@
+<div class="code-block" data-reveal>
+    <div class="code-block__bar">
+        <span class="code-block__label">{{ value.filename|default:value.language }}</span>
+        <button type="button" class="code-block__copy" data-copy-code>Copy</button>
+    </div>
+    <pre><code class="language-{{ value.language }}">{{ value.code }}</code></pre>
+</div>

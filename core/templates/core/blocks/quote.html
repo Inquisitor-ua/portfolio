@@ -1,0 +1,17 @@
+{% load wagtailimages_tags core_tags %}
+<figure class="quote-block" data-reveal>
+    {% icon "quote" css_class="quote-block__mark" %}
+    <blockquote><p>{{ value.quote }}</p></blockquote>
+    {% if value.attribution %}
+    <figcaption class="quote-block__attribution">
+        {% if value.avatar %}
+        {% image value.avatar fill-64x64 as avatar_img %}
+        <img src="{{ avatar_img.url }}" width="{{ avatar_img.width }}" height="{{ avatar_img.height }}" alt="{{ value.attribution }}" class="quote-block__avatar">
+        {% endif %}
+        <span>
+            <strong>{{ value.attribution }}</strong>
+            {% if value.role %}<br><span class="quote-block__role">{{ value.role }}</span>{% endif %}
+        </span>
+    </figcaption>
+    {% endif %}
+</figure>

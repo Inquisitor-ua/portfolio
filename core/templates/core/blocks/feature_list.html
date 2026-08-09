@@ -1,0 +1,15 @@
+{% load core_tags %}
+<div class="feature-grid feature-grid--cols-{{ value.columns }}" data-reveal>
+    {% for item in value.items %}
+    <div class="feature-card">
+        {% if item.icon %}{% icon item.icon css_class="feature-card__icon" %}{% endif %}
+        <h3 class="feature-card__title">{{ item.title }}</h3>
+        {% if item.text %}<div class="prose">{{ item.text }}</div>{% endif %}
+        {% if item.link.href %}
+        <a href="{{ item.link.href }}"{% if item.link.open_in_new_tab %} target="_blank" rel="noopener"{% endif %} class="feature-card__link">
+            {{ item.link.text }}{% icon "arrow-right" %}
+        </a>
+        {% endif %}
+    </div>
+    {% endfor %}
+</div>

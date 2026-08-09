@@ -1,0 +1,12 @@
+{% load wagtailimages_tags %}
+<div class="tech-grid tech-grid--{{ value.size }}" data-reveal>
+    {% for tech in value.technologies %}
+    <div class="tech-badge">
+        {% if tech.logo %}
+        {% image tech.logo height-32 as logo_img %}
+        <img src="{{ logo_img.url }}" width="{{ logo_img.width }}" height="{{ logo_img.height }}" alt="" loading="lazy">
+        {% endif %}
+        <span>{{ tech.name }}</span>
+    </div>
+    {% endfor %}
+</div>

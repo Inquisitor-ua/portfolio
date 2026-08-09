@@ -1,0 +1,21 @@
+{% load wagtailimages_tags core_tags %}
+<div class="testimonial-grid testimonial-grid--cols-{{ value.columns }}" data-reveal>
+    {% for testimonial in value.testimonials %}
+    <figure class="testimonial-card">
+        {% icon "quote" css_class="testimonial-card__mark" %}
+        <blockquote><p>{{ testimonial.quote }}</p></blockquote>
+        <figcaption>
+            {% if testimonial.avatar %}
+            {% image testimonial.avatar fill-56x56 as avatar_img %}
+            <img src="{{ avatar_img.url }}" width="{{ avatar_img.width }}" height="{{ avatar_img.height }}" alt="{{ testimonial.name }}">
+            {% endif %}
+            <span>
+                <strong>{{ testimonial.name }}</strong>
+                {% if testimonial.role or testimonial.company %}
+                <br><span class="testimonial-card__role">{{ testimonial.role }}{% if testimonial.role and testimonial.company %}, {% endif %}{{ testimonial.company }}</span>
+                {% endif %}
+            </span>
+        </figcaption>
+    </figure>
+    {% endfor %}
+</div>

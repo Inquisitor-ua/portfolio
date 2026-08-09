@@ -1,0 +1,24 @@
+{% load core_tags %}
+<div class="timeline" data-reveal>
+    {% for entry in value.entries %}
+    <div class="timeline__item{% if entry.current %} timeline__item--current{% endif %}">
+        <div class="timeline__marker">{% if value.icon %}{% icon value.icon %}{% endif %}</div>
+        <div class="timeline__content">
+            <p class="timeline__period">{{ entry.period }}{% if entry.current %}<span class="badge badge--accent">Current</span>{% endif %}</p>
+            <h3 class="timeline__title">{{ entry.title }}</h3>
+            {% if entry.organisation %}
+            <p class="timeline__org">
+                {% if entry.organisation_url %}<a href="{{ entry.organisation_url }}" target="_blank" rel="noopener">{{ entry.organisation }}</a>{% else %}{{ entry.organisation }}{% endif %}
+                {% if entry.location %}<span class="timeline__location">{{ entry.location }}</span>{% endif %}
+            </p>
+            {% endif %}
+            {% if entry.description %}<div class="prose">{{ entry.description }}</div>{% endif %}
+            {% if entry.technologies %}
+            <ul class="tag-list">
+                {% for tech in entry.technologies %}<li class="tag">{{ tech.name }}</li>{% endfor %}
+            </ul>
+            {% endif %}
+        </div>
+    </div>
+    {% endfor %}
+</div>

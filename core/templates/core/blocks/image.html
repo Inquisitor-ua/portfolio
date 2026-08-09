@@ -1,0 +1,8 @@
+{% load wagtailimages_tags %}
+<figure class="media-block media-block--{{ value.width }}{% if value.rounded %} media-block--rounded{% endif %}" data-reveal>
+    {% if value.link.href %}<a href="{{ value.link.href }}"{% if value.link.open_in_new_tab %} target="_blank" rel="noopener"{% endif %}>{% endif %}
+    {% image value.image width-1600 as rendered_image %}
+    <img src="{{ rendered_image.url }}" width="{{ rendered_image.width }}" height="{{ rendered_image.height }}" alt="{{ value.alt_text|default:value.image.title }}" loading="lazy">
+    {% if value.link.href %}</a>{% endif %}
+    {% if value.caption %}<figcaption>{{ value.caption }}</figcaption>{% endif %}
+</figure>

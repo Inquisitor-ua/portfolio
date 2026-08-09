@@ -1,0 +1,25 @@
+{% load wagtailcore_tags core_tags %}
+{% wagtail_site as current_site %}
+
+<footer class="site-footer">
+    <div class="container container--full site-footer__inner">
+        <p class="site-footer__note">
+            &copy; {% current_year %} {{ settings.core.SiteBrandingSettings.site_name|default:current_site.site_name|default:"Portfolio" }}.
+            {% if settings.core.NavigationSettings.footer_note %}{{ settings.core.NavigationSettings.footer_note }}{% endif %}
+        </p>
+
+        {% with social_links=settings.core.ContactSettings.social_links %}
+        {% if social_links %}
+        <ul class="site-footer__social">
+            {% for link in social_links %}
+            <li>
+                <a href="{{ link.value.url }}" target="_blank" rel="noopener" aria-label="{{ link.value.label|default:link.value.platform }}" class="social-link">
+                    {% icon link.value.platform %}
+                </a>
+            </li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+        {% endwith %}
+    </div>
+</footer>

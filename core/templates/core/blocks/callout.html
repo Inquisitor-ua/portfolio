@@ -1,0 +1,8 @@
+{% load core_tags %}
+<div class="callout callout--{{ value.tone }}" data-reveal>
+    {% if value.icon %}{% icon value.icon css_class="callout__icon" %}{% endif %}
+    <div class="callout__body">
+        {% if value.title %}<p class="callout__title">{{ value.title }}</p>{% endif %}
+        <div class="prose">{{ value.text }}</div>
+    </div>
+</div>

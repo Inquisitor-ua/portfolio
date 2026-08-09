@@ -1,0 +1,22 @@
+{% load wagtailimages_tags core_tags %}
+<section class="section section--bg-{{ value.background }} cta-section"{% if value.anchor %} id="{{ value.anchor }}"{% endif %} data-reveal>
+    <div class="container container--normal cta-section__inner">
+        {% if value.image %}
+        {% image value.image width-320 as cta_img %}
+        <img src="{{ cta_img.url }}" width="{{ cta_img.width }}" height="{{ cta_img.height }}" alt="" class="cta-section__image">
+        {% endif %}
+        <div class="cta-section__body">
+            <h2 class="section__title">{{ value.heading }}</h2>
+            {% if value.text %}<div class="prose">{{ value.text }}</div>{% endif %}
+            {% if value.links %}
+            <div class="button-row">
+                {% for link in value.links %}
+                <a href="{{ link.href }}"{% if link.open_in_new_tab %} target="_blank" rel="noopener"{% endif %} class="btn btn--{{ link.style }}">
+                    {% if link.icon %}{% icon link.icon css_class="btn__icon" %}{% endif %}<span>{{ link.text }}</span>
+                </a>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</section>

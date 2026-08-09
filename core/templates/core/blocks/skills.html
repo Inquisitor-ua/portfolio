@@ -1,0 +1,23 @@
+<div class="skills" data-vue-app="skills-meters" data-show-levels="{{ value.show_levels|yesno:'1,0' }}" data-reveal>
+    {{ skills_payload|json_script }}
+    <div class="skills__fallback" data-skills-fallback>
+        {% for group in value.groups %}
+        <div class="skills-group">
+            <h3 class="skills-group__name">{{ group.name }}</h3>
+            <ul class="skills-group__list">
+                {% for skill in group.skills %}
+                <li class="skill">
+                    <div class="skill__row">
+                        <span class="skill__name">{{ skill.name }}</span>
+                        {% if skill.note %}<span class="skill__note">{{ skill.note }}</span>{% endif %}
+                    </div>
+                    {% if value.show_levels %}
+                    <div class="skill__meter"><span style="width: {% widthratio skill.level 5 100 %}%"></span></div>
+                    {% endif %}
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endfor %}
+    </div>
+</div>

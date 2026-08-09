@@ -1,0 +1,9 @@
+{% load core_tags %}
+<div class="button-row button-row--{{ value.align }}">
+    {% for link in value.links %}
+    <a href="{{ link.href }}"{% if link.open_in_new_tab %} target="_blank" rel="noopener"{% endif %} class="btn btn--{{ link.style }}">
+        {% if link.icon %}{% icon link.icon css_class="btn__icon" %}{% endif %}
+        <span>{{ link.text }}</span>
+    </a>
+    {% endfor %}
+</div>
