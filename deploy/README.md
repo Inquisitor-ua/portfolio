@@ -1,81 +1,30 @@
 # Deploying yehor-inq.com
 
-Target architecture, once this is done:
+This project is deployed as a plain Docker Compose stack (`db` + `web`)
+with **no ports published to the host**. It's reached through the shared
+**nginx-proxy** stack (a separate repo, `../nginx-proxy` on the server),
+which is the single process on the server listening on 80/443 and fanning
+requests out to every project — `crossword`, `splitbot`, and this one — by
+`server_name`, over a shared external Docker network called `edge`.
+See `../nginx-proxy/README.md` for the full picture, including the
+Cloudflare Origin CA certificate setup (Cloudflare terminates TLS for
+visitors, then re-encrypts to this origin — no Let's Encrypt/certbot
+needed here).
 
-```
-                 ┌─────────────────────────────────────────┐
-                 │   system nginx (apt, NOT in Docker)      │
-                 │   listens on 80/443 for ALL domains      │
-Internet ──443──▶│                                          │
-                 │   yehor-inq.com        ──▶ 127.0.0.1:8001│──▶ gunicorn (Docker: web)
-                 │   crossword.yehor-inq.com ─▶ 127.0.0.1:8081│──▶ crossword's container
-                 └─────────────────────────────────────────┘
-```
+nginx-proxy's `conf.d/portfolio.conf` routes `yehor-inq.com` /
+`www.yehor-inq.com` to this project's `portfolio-web` container by name,
+and serves `/media/` directly from this repo's `media/` directory, which
+nginx-proxy mounts read-only from `../portfolio/media`. Static assets
+don't need that — WhiteNoise serves them from inside gunicorn.
 
-Right now crossword's own docker-compose nginx binds `0.0.0.0:80`/`:443`
-directly, so there is no room for a second project to also bind those
-ports. The fix is to stop letting *any* per-project container touch
-80/443, and instead run a single system-level nginx that fans requests out
-by `server_name`. This only requires remapping crossword's nginx container
-to a localhost-only port — its app containers are untouched.
-
-This is a change to a live service — do it in a low-traffic window and
-keep the old `docker-compose.yml` around so you can revert the port
-mapping instantly if something looks wrong.
-
-## 0. One-time host prep
+## 1. One-time server prep (only if not already done for another project)
 
 ```bash
-sudo apt update
-sudo apt install -y nginx certbot python3-certbot-nginx
-sudo systemctl enable --now nginx
+docker network create edge
 ```
 
-## 1. Free up 80/443 from crossword
-
-On the crossword project (wherever its `docker-compose.yml` lives):
-
-1. Back it up: `cp docker-compose.yml docker-compose.yml.bak`.
-2. In the `nginx` service's `ports:`, change:
-   ```yaml
-   ports:
-     - "80:80"
-     - "443:443"
-   ```
-   to:
-   ```yaml
-   ports:
-     - "127.0.0.1:8081:80"
-   ```
-   (drop the 443 mapping — TLS termination moves to the host nginx).
-3. If crossword's `nginx.conf` has an `ssl_certificate` / `listen 443`
-   server block, comment it out — it no longer receives HTTPS traffic
-   directly, host nginx does. Reload it with `docker compose up -d`.
-4. Verify: `curl -I http://127.0.0.1:8081` should return crossword's
-   response. `sudo ss -tlnp | grep -E ':80|:443'` should now show only
-   host nginx.
-5. Add a host nginx site for it, e.g.
-   `/etc/nginx/sites-available/crossword.yehor-inq.com.conf`:
-   ```nginx
-   server {
-       listen 80;
-       server_name crossword.yehor-inq.com;
-       location / {
-           proxy_pass http://127.0.0.1:8081;
-           proxy_set_header Host $host;
-           proxy_set_header X-Real-IP $remote_addr;
-           proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-           proxy_set_header X-Forwarded-Proto $scheme;
-       }
-   }
-   ```
-   ```bash
-   sudo ln -s /etc/nginx/sites-available/crossword.yehor-inq.com.conf /etc/nginx/sites-enabled/
-   sudo nginx -t && sudo systemctl reload nginx
-   sudo certbot --nginx -d crossword.yehor-inq.com
-   ```
-   (If crossword already had a Let's Encrypt cert issued on the host from
-   before it moved into Docker, certbot will just renew/reuse it.)
+If `../nginx-proxy` isn't deployed yet on this server, set it up first —
+see its README (Cloudflare Origin CA cert, `docker compose up -d`).
 
 ## 2. Deploy this project
 
@@ -90,11 +39,10 @@ Edit `.env`:
 - `SECRET_KEY` — generate with `python3 -c "import secrets; print(secrets.token_urlsafe(50))"`
 - `POSTGRES_PASSWORD` — a strong random password
 - `ALLOWED_HOSTS`, `CSRF_TRUSTED_ORIGINS`, `WAGTAILADMIN_BASE_URL` — already
-  default to `yehor-inq.com` in `.env.example`, adjust if you also want
-  `www`.
-- Leave `SECURE_SSL_ENABLED=1` — nginx redirects to HTTPS once certbot has
-  run (step 3). If you want to smoke-test over plain HTTP first, set it to
-  `0` temporarily.
+  default to `yehor-inq.com` in `.env.example`, adjust if needed.
+- Leave `SECURE_SSL_ENABLED=1` — nginx-proxy always terminates TLS and
+  forwards `X-Forwarded-Proto: https`, so Django's HTTPS-only flags
+  (redirect, secure cookies, HSTS) should stay on from the start.
 
 ```bash
 mkdir -p media
@@ -102,45 +50,44 @@ docker compose up -d --build
 docker compose logs -f web   # watch migrate/collectstatic, Ctrl-C when it settles
 ```
 
-`web` now listens on `127.0.0.1:8001` only (see `docker-compose.yml`).
+`web` (container name `portfolio-web`) publishes no host ports — it's only
+reachable by name on the `edge` network, which is exactly what
+nginx-proxy's `portfolio.conf` expects.
 
-## 3. Host nginx + TLS for yehor-inq.com
+## 3. Point nginx-proxy at it
+
+On the server, in `../nginx-proxy`:
 
 ```bash
-sudo cp deploy/nginx/yehor-inq.com.conf /etc/nginx/sites-available/
-sudo ln -s /etc/nginx/sites-available/yehor-inq.com.conf /etc/nginx/sites-enabled/
-sudo nginx -t && sudo systemctl reload nginx
-sudo certbot --nginx -d yehor-inq.com -d www.yehor-inq.com
+git pull
+docker compose up -d   # picks up conf.d/portfolio.conf + the new media volume mount
 ```
 
-Certbot edits the `listen 80` block in place to add `listen 443 ssl` +
-redirect. Confirm `https://yehor-inq.com` loads.
+If nginx-proxy was already running and only `conf.d/` changed (no volume
+changes), `docker compose restart nginx` or `docker exec edge-nginx nginx -s reload`
+is enough — but the media volume mount requires recreating the container,
+which `docker compose up -d` handles automatically when it detects the
+compose file changed.
+
+Confirm: `curl -H "Host: yehor-inq.com" http://127.0.0.1` from the server,
+then check `https://yehor-inq.com` through the real domain.
 
 ## 4. DNS / Cloudflare
 
 - Add `A` records for `yehor-inq.com` and `www` pointing at the server's
-  IP (orange-cloud/proxied as you prefer).
-- Once the origin has a valid Let's Encrypt cert, set Cloudflare SSL/TLS
-  mode to **Full (strict)** for the zone so Cloudflare↔origin traffic is
-  also encrypted and verified.
+  IP, proxied (orange cloud) through Cloudflare.
+- SSL/TLS mode should already be **Full (strict)** for the zone (shared
+  with crossword/splitbot) — see `../nginx-proxy/README.md`.
 
-## 5. Firewall
-
-```bash
-sudo ufw allow 22/tcp
-sudo ufw allow 80/tcp
-sudo ufw allow 443/tcp
-sudo ufw enable   # if not already
-```
-Nothing else needs to be open — both app containers (8001, 8081) are
-bound to `127.0.0.1` only.
-
-## 6. Auto-deploy on push to main
+## 5. Auto-deploy on push to main
 
 `.github/workflows/deploy.yml` SSHes into the server and runs
 `deploy/deploy.sh` (git reset to `origin/main`, `docker compose up -d
 --build`), then purges the whole Cloudflare cache via the API — all
-triggered by a push to `main`.
+triggered by a push to `main`. This only rebuilds/restarts the `portfolio`
+stack itself; it does not touch nginx-proxy, so a `conf.d/portfolio.conf`
+change still needs a manual `git pull` + `docker compose up -d` in
+`../nginx-proxy` as in step 3.
 
 Create a low-privilege deploy user (or reuse the one you cloned the repo
 as) that is in the `docker` group and owns `/srv/portfolio`:

@@ -16,6 +16,7 @@ services:
 
   web:
     build: .
+    container_name: portfolio-web
     restart: unless-stopped
     env_file: .env
     environment:
@@ -26,10 +27,16 @@ services:
     volumes:
       - static_files:/app/staticfiles
       - ./media:/app/media
-    ports:
-      # Bound to localhost only — the host-level nginx (see deploy/nginx/)
-      # is the sole process listening on 80/443 and reverse-proxies here.
-      - "127.0.0.1:8001:8000"
+    # No ports published to the host — reached by the shared nginx-proxy
+    # ("edge-nginx") over the external "edge" network, by container name.
+    # See ../nginx-proxy/README.md and conf.d/portfolio.conf.
+    networks:
+      - default
+      - edge
+
+networks:
+  edge:
+    external: true
 
 volumes:
   db_data:
